@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import Customer from './components/Customer';
 import { Paper, Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
@@ -16,35 +16,19 @@ const styles = theme => ({
 })
 
 function App(props) {
-  const customers = [
-    {
-      id: 1,
-      image: 'https://placeimg.com/64/64/1',
-      name: '나동빈',
-      birthday: '961203',
-      gender: '남자',
-      job: '대학생',
-    },
-    {
-      id: 2,
-      image: 'https://placeimg.com/64/64/2',
-      name: '홍길동',
-      birthday: '961222',
-      gender: '남자',
-      job: '프로그래머',
-    },
-    {
-      id: 3,
-      image: 'https://placeimg.com/64/64/3',
-      name: '개똥이',
-      birthday: '931222',
-      gender: '남자',
-      job: '디자이너',
-    },
-  ]
-
+  useEffect(() => {
+    let callApi = async () => {
+      const response = await fetch('/api/customers');
+      const body = await response.json();
+      return body;
+    }
+    callApi()
+      .then(res => setState({ customers: res }))
+      .catch(err => console.log(err));
+    return;
+  }, [])
   const { classes } = props;
-
+  const [state, setState] = useState({ customers: "" });
   return (
     <Paper className={classes.root}>
       <Table className={classes.table}>
@@ -60,7 +44,7 @@ function App(props) {
         </TableHead>
         <TableBody>
           {
-            customers.map((data, index) => {
+            state.customers ? state.customers.map((data, index) => {
               return (
                 <Customer
                   key={index}
@@ -72,9 +56,11 @@ function App(props) {
                   job={data.job}
                 />
               )
-            })
+            }) : 
+            <div style={{textAlign:'center'}}>
+              <h1>데이터가 없습니다.</h1>
+            </div>
           }
-
         </TableBody>
       </Table>
     </Paper>
