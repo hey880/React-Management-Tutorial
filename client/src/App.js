@@ -3,6 +3,7 @@ import './App.css';
 import Customer from './components/Customer';
 import { Paper, Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
 import { withStyles } from '@mui/styles';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const styles = theme => ({
   root: {
@@ -12,23 +13,31 @@ const styles = theme => ({
   },
   table: {
     minWidth: 1080,
+  },
+  progress: {
+    //marginTop: theme.spacing(2),
+    marginTop : '50px'
   }
 })
 
 function App(props) {
+  const [state, setState] = useState({ customers: "", completed: 0 });
+
+  let callApi = async () => {
+    const response = await fetch('/api/customers');
+    const body = await response.json();
+    return body;
+  }
+
   useEffect(() => {
-    let callApi = async () => {
-      const response = await fetch('/api/customers');
-      const body = await response.json();
-      return body;
-    }
     callApi()
       .then(res => setState({ customers: res }))
       .catch(err => console.log(err));
     return;
   }, [])
+
   const { classes } = props;
-  const [state, setState] = useState({ customers: "" });
+  
   return (
     <Paper className={classes.root}>
       <Table className={classes.table}>
@@ -56,10 +65,7 @@ function App(props) {
                   job={data.job}
                 />
               )
-            }) : 
-            <div style={{textAlign:'center'}}>
-              <h1>데이터가 없습니다.</h1>
-            </div>
+            }) : <h1>데이터가 없습니다.</h1>
           }
         </TableBody>
       </Table>
